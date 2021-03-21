@@ -4,29 +4,65 @@ import com.rabbitmq.client.ConnectionFactory;
 import com.rabbitmq.client.DeliverCallback;
 
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.EtchedBorder;
+import javax.swing.border.TitledBorder;
+import java.awt.*;
 import java.io.IOException;
 import java.util.concurrent.TimeoutException;
 
 public class UserReceiver {
     public final static String QUEUE_NAME1="user1";
     public final static String QUEUE_NAME2="user2";
-    static JLabel userLabel1, userLabel2;
     public static void main(String[] args) throws IOException, TimeoutException {
         receive();
     }
 
     static void receive() throws IOException, TimeoutException {
-        JFrame f= new JFrame("Label Example");
+        JPanel jPanel = new JPanel();
+        jPanel.setBorder(new TitledBorder(new EtchedBorder(), "Receiver"));
+        jPanel.setBounds(10,30,1000,600);
+        JFrame f= new JFrame("Text Editor");
 
-        userLabel1=new JLabel("User one say: ");
-        userLabel1.setBounds(50,50, 300,30);
-        f.add(userLabel1);
+        JTextArea area1=new JTextArea(20,20);
+        Font fieldFont = new Font("Arial", Font.PLAIN, 20);
+        area1.setFont(fieldFont);
+        area1.setBorder(BorderFactory.createCompoundBorder(
+                new CustomeBorder(),
+                new EmptyBorder(new Insets(15, 25, 15, 25))));
 
-        userLabel2=new JLabel("User two say: ");
-        userLabel2.setBounds(50,100, 300,30);
-        f.add(userLabel2);
+        area1.setEditable(false);
+        area1.setLineWrap(true);
+        area1.setWrapStyleWord(true);
 
-        f.setSize(500,500);
+
+        JScrollPane scroll1 = new JScrollPane(area1);
+        scroll1.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+        scroll1.setBounds(10, 265, 455, 249);
+
+        jPanel.add(scroll1);
+
+
+
+        JTextArea area2=new JTextArea(20,20);
+        area2.setFont(fieldFont);
+        area2.setBorder(BorderFactory.createCompoundBorder(
+                new CustomeBorder(),
+                new EmptyBorder(new Insets(15, 25, 15, 25))));
+
+        area2.setEditable(false);
+        area2.setLineWrap(true);
+        area2.setWrapStyleWord(true);
+
+
+        JScrollPane scroll2 = new JScrollPane(area2);
+        scroll2.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+        scroll2.setBounds(10, 11, 455, 249);
+
+        jPanel.add(scroll2);
+
+        f.add(jPanel);
+        f.setSize(1000,800);
         f.setLayout(null);
         f.setVisible(true);
 
@@ -47,7 +83,7 @@ public class UserReceiver {
 
         DeliverCallback deliverCallback = (consumerTag, delivery) -> {
             String receivedMessage = new String(delivery.getBody(),"UTF-8");
-            userLabel1.setText("User one say: "+receivedMessage);
+            area1.setText(receivedMessage);
             System.out.println(" [x] sent '"+receivedMessage+" '");
 
         };
@@ -55,7 +91,7 @@ public class UserReceiver {
 
         DeliverCallback deliverCallback2 = (consumerTag, delivery) -> {
             String receivedMessage = new String(delivery.getBody(),"UTF-8");
-            userLabel2.setText("User two say: "+receivedMessage);
+            area2.setText(receivedMessage);
             System.out.println(" [x] sent '"+receivedMessage+" '");
 
         };
